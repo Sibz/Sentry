@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement style="flex-direction: row;&#10;justify-content: space-between;&#10;padding-left: 10px;&#10;">
+        <Style src="Lobby_ListItem.uss" />
+        <ui:Label text="Game Name" class="game-name" style="-unity-text-align: middle-left;&#10;" />
+        <ui:VisualElement style="flex-direction: row;&#10;">
+            <ui:Button text="Join" class="join-button" />
+            <ui:Button text="Destroy" class="destroy" />
+            <uie:IntegerField class="game-id" style="display: none;&#10;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

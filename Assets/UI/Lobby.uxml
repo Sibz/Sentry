@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement style="flex-direction: row;&#10;justify-content: center;&#10;">
+        <Style src="Lobby.uss" />
+        <ui:VisualElement style="min-width: 320px;&#10;max-width: 450px;&#10;flex-grow: 1;&#10;background-color: rgba(223, 243, 255, 0.36);&#10;">
+            <ui:VisualElement name="NotConnectedArea">
+                <ui:Button text="Connect To Lobby" name="Connect" />
+            </ui:VisualElement>
+            <ui:VisualElement name="ConnectedArea">
+                <ui:Button text="Disconnect From Lobby" name="Disconnect" />
+                <ui:VisualElement style="flex-direction: row;&#10;">
+                    <ui:TextField picking-mode="Ignore" label="New Game Name" value="Enter Name" text="Enter Name" name="GameName" style="flex-grow: 1;&#10;" />
+                    <ui:Button text="Create Game" name="CreateGame" style="width: 85px;&#10;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row-reverse;&#10;">
+                    <ui:Button text="Refresh List" name="Refresh" style="width: 85px;&#10;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="ListArea" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
