@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Sibz.Sentry.Components;
 using Sibz.Sentry.Lobby.Client;
 using Unity.UIElements.Runtime;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -51,10 +50,10 @@ namespace Sibz.Sentry
 
         private async void OnClick(ClickEvent evt)
         {
-            if (evt.target is Button b && b.ClassListContains("destroy") && b.parent.Q<IntegerField>() is IntegerField integerField)
+            if (evt.target is Button b && b.ClassListContains("destroy") && b.parent.parent.parent is VisualElement parent)
             {
-                Debug.Log($"Destroying game {integerField.value}");
-                client.DestroyGame(integerField.value);
+                Debug.Log($"Destroying game {(int)parent.userData}");
+                client.DestroyGame((int)parent.userData);
                 await RefreshList(0.5f);
             }
         }
@@ -109,8 +108,7 @@ namespace Sibz.Sentry
                 NewGameItemTemplate.CloneTree(item);
                 if (item.Q(null, "game-name") is Label l)
                     l.text = gameInfoComponent.Name.ToString();
-                if (item.Q<IntegerField>() is IntegerField i)
-                    i.value = gameInfoComponent.Id;
+                item.userData = gameInfoComponent.Id;
                 ListArea.Add(item);
             }
         }

@@ -5,7 +5,6 @@
         <ui:VisualElement style="flex-direction: row;&#10;">
             <ui:Button text="Join" class="join-button" />
             <ui:Button text="Destroy" class="destroy" />
-            <uie:IntegerField class="game-id" style="display: none;&#10;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
