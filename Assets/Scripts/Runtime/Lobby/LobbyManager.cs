@@ -1,9 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Sibz.Sentry.Components;
-using Sibz.Sentry.Lobby.Client;
+using Sibz.NetCode;
 using Unity.UIElements.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -27,15 +25,26 @@ namespace Sibz.Sentry
 
         private VisualElement ListArea => visualTree?.Q("ListArea");
 
-        private readonly LobbyClient client = new LobbyClient();
-
         private bool runRefresh;
         private bool refreshList;
         private Coroutine refreshConnectionState;
 
+        private ServerWorld serverWorld;
+        private ClientWorld clientWorld;
+
         // Start is called before the first frame update
         void Start()
         {
+            serverWorld = new ServerWorld(new ServerOptions()
+            {
+                WorldName = "Lobby Server",
+                CreateWorldOnInstantiate = true,
+                Address = "0.0.0.0",
+                Port = 2165,
+                GhostCollectionPrefab = Resources.Load<GameObject>("Collection")
+            });
+            serverWorld.ListenSuccess += () => NotConnectedArea.style.display = DisplayStyle.Flex;
+            serverWorld.Listen();
             visualTree = GetComponent<PanelRenderer>().visualTree;
             CreateGame.RegisterCallback<ClickEvent>(OnCreateGameClick);
             Refresh.RegisterCallback<ClickEvent>(OnRefreshClick);
@@ -45,7 +54,8 @@ namespace Sibz.Sentry
             ConnectedArea.style.display = DisplayStyle.None;
             NotConnectedArea.style.display = DisplayStyle.None;
             runRefresh = true;
-            refreshConnectionState = StartCoroutine(CheckLobbyConnectionState());
+
+            //refreshConnectionState = StartCoroutine(CheckLobbyConnectionState());
         }
 
         private async void OnClick(ClickEvent evt)
@@ -53,7 +63,7 @@ namespace Sibz.Sentry
             if (evt.target is Button b && b.ClassListContains("destroy") && b.parent.parent.parent is VisualElement parent)
             {
                 Debug.Log($"Destroying game {(int)parent.userData}");
-                client.DestroyGame((int)parent.userData);
+                /*client.DestroyGame((int)parent.userData);*/
                 await RefreshList(0.5f);
             }
         }
@@ -63,7 +73,7 @@ namespace Sibz.Sentry
             while (runRefresh)
             {
                 yield return new WaitForSeconds(0.2f);
-                if (client.IsConnected)
+                /*if (client.IsConnected)
                 {
                     ConnectedArea.style.display = DisplayStyle.Flex;
                     NotConnectedArea.style.display = DisplayStyle.None;
@@ -73,13 +83,13 @@ namespace Sibz.Sentry
                     ConnectedArea.style.display = DisplayStyle.None;
                     NotConnectedArea.style.display = DisplayStyle.Flex;
                     refreshList = false;
-                }
+                }*/
             }
         }
 
         private async void OnCreateGameClick(ClickEvent evt)
         {
-            client.CreateNewGame(GameName.text);
+            /*client.CreateNewGame(GameName.text);*/
             GameName.value = "";
             await RefreshList(0.2f);
         }
@@ -100,7 +110,7 @@ namespace Sibz.Sentry
             }
             if (!refreshList)
                 return;
-            IEnumerable<GameInfoComponent> items = client.GetItems();
+            /*IEnumerable<GameInfoComponent> items = client.GetItems();
             ListArea.Clear();
             foreach (GameInfoComponent gameInfoComponent in items)
             {
@@ -110,13 +120,49 @@ namespace Sibz.Sentry
                     l.text = gameInfoComponent.Name.ToString();
                 item.userData = gameInfoComponent.Id;
                 ListArea.Add(item);
-            }
+            }*/
+        }
+
+        private ClientWorld CreateClientWorld()
+        {
+            ClientWorld world = new ClientWorld(new ClientOptions()
+            {
+                WorldName = "Lobby Client",
+                Port = 2165,
+                Address = "127.0.0.1",
+                GhostCollectionPrefab = Resources.Load<GameObject>("Collection")
+            });
+            world.Connected += i =>
+            {
+                ConnectedArea.style.display = DisplayStyle.Flex;
+                NotConnectedArea.style.display = DisplayStyle.None;
+            };
+            world.Disconnected += () =>
+            {
+                ConnectedArea.style.display = DisplayStyle.None;
+                NotConnectedArea.style.display = DisplayStyle.Flex;
+                ListArea.Clear();
+                clientWorld.Dispose();
+                clientWorld = null;
+            };
+            world.Connecting += () => Debug.Log("Connecting...");
+            world.ConnectionFailed += s => Debug.Log($"Connect Failed: {s}");
+            return world;
         }
 
         private async void OnConnectClick(ClickEvent evt)
         {
             ListArea.Clear();
-            client.CreateLobbyWorld();
+
+            clientWorld = clientWorld ?? CreateClientWorld();
+
+            if (!clientWorld.World.IsCreated)
+            {
+                clientWorld.CreateWorld();
+            }
+
+            clientWorld.Connect();
+            /*client.CreateLobbyWorld();
             client.ConnectToServerLobby();
             await RefreshList(0.1f);
             await RefreshList(0.5f);
@@ -127,13 +173,11 @@ namespace Sibz.Sentry
                 {
                     await RefreshList(1f);
                 }
-            }).Start();
+            }).Start();*/
         }
         private async void OnDisconnectClick(ClickEvent evt)
         {
-            ListArea.Clear();
-            refreshList = false;
-            await client.DisconnectAsync(true);
+            clientWorld.Disconnect();
         }
 
 
@@ -144,7 +188,10 @@ namespace Sibz.Sentry
             Connect.UnregisterCallback<ClickEvent>(OnConnectClick);
             runRefresh = false;
             refreshList = false;
-            StopCoroutine(refreshConnectionState);
+            if (refreshConnectionState!=null)
+            {
+                StopCoroutine(refreshConnectionState);
+            }
         }
     }
 }

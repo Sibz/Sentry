@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Unity.Entities;
+using UnityEngine;
+
+[assembly: DisableAutoCreation]
 
 namespace Sibz.Sentry
 {

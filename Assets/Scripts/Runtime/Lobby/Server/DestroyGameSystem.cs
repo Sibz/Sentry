@@ -1,6 +1,6 @@
-﻿using Sibz.Lobby.Requests;
-using Sibz.Sentry.Components;
-using Sibz.Sentry.Lobby.Requests;
+﻿﻿using Sibz.Lobby.Requests;
+ using Sibz.NetCode;
+ using Sibz.Sentry.Components;
 using Sibz.Sentry.Lobby.Server.Jobs;
 using Unity.Collections;
 using Unity.Entities;
@@ -9,6 +9,7 @@ using Unity.NetCode;
 
 namespace Sibz.Sentry.Lobby.Server
 {
+    //    [ServerSystem]
     public class DestroyGameSystem : JobComponentSystem
     {
         private EndSimulationEntityCommandBufferSystem bufferSystem;

@@ -1,4 +1,5 @@
-﻿using Sibz.Sentry.Components;
+﻿﻿using Sibz.NetCode;
+ using Sibz.Sentry.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -7,6 +8,7 @@ using UnityEngine;
 
 namespace Sibz.Sentry.Lobby.Server
 {
+    //[ServerSystem]
     public class CreateGameSystem : JobComponentSystem
     {
         private Entity prefab;

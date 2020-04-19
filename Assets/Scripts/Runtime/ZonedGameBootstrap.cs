@@ -1,5 +1,4 @@
-﻿using Sibz.RpcRequestConverter;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.NetCode;
 
 namespace Sibz.Sentry
@@ -17,11 +16,12 @@ namespace Sibz.Sentry
             DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups(world, ExplicitDefaultWorldSystems);
             ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world);
 
+            /*
             World lobby = CreateServerWorld(world, "LobbyWorld");
             lobby.GetExistingSystem<ServerInitializationSystemGroup>().AddSystemToUpdateList( lobby.GetOrCreateSystem<LobbyServerWorldInitGroup>());
             lobby.GetExistingSystem<ServerSimulationSystemGroup>().AddSystemToUpdateList( lobby.GetOrCreateSystem<LobbyServerWorldSimGroup>());
             lobby.GetExistingSystem<RpcCommandRequestSystemGroup>().AddSystemToUpdateList( lobby.GetOrCreateSystem<LobbyRpcRequestGroup>());
-            ConvertToRpcRequestSystem.CreateInWorld(lobby);
+            ConvertToRpcRequestSystem.CreateInWorld(lobby);*/
             return true;
         }
     }
