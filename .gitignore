@@ -13,8 +13,6 @@ Assets/Plugins/Editor/JetBrains*
 Assets/AssetStoreTools*
 
 [lL]ogs/
-[pP]roject[sS]ettings/
-
 
 # Visual Studio cache directory
 .vs/
