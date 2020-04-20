@@ -1,14 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using Sibz.NetCode;
+using Sibz.NetCode.WorldExtensions;
+using Sibz.Sentry.Client;
+using Sibz.Sentry.Components;
+using Sibz.Sentry.Lobby.Server;
+using Unity.Entities;
 using Unity.UIElements.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Sibz.Sentry
 {
-
     public class LobbyManager : MonoBehaviour
     {
         public VisualTreeAsset NewGameItemTemplate;
@@ -19,7 +24,7 @@ namespace Sibz.Sentry
         private Button Disconnect => visualTree?.Q<Button>("Disconnect");
         private Button CreateGame => visualTree?.Q<Button>("CreateGame");
         private TextField GameName => visualTree?.Q<TextField>("GameName");
-        private  Button Refresh => visualTree?.Q<Button>("Refresh");
+        private Button Refresh => visualTree?.Q<Button>("Refresh");
         private VisualElement ConnectedArea => visualTree?.Q("ConnectedArea");
         private VisualElement NotConnectedArea => visualTree?.Q("NotConnectedArea");
 
@@ -29,25 +34,17 @@ namespace Sibz.Sentry
         private bool refreshList;
         private Coroutine refreshConnectionState;
 
-        private ServerWorld serverWorld;
-        private ClientWorld clientWorld;
+        private LobbyServer lobbyServer;
+        private LobbyClient lobbyClient;
 
         // Start is called before the first frame update
         void Start()
         {
-            serverWorld = new ServerWorld(new ServerOptions()
-            {
-                WorldName = "Lobby Server",
-                CreateWorldOnInstantiate = true,
-                Address = "0.0.0.0",
-                Port = 2165,
-                GhostCollectionPrefab = Resources.Load<GameObject>("Collection")
-            });
-            serverWorld.ListenSuccess += () => NotConnectedArea.style.display = DisplayStyle.Flex;
-            serverWorld.Listen();
+            lobbyServer = new LobbyServer(()=>
+                NotConnectedArea.style.display = DisplayStyle.Flex);
             visualTree = GetComponent<PanelRenderer>().visualTree;
             CreateGame.RegisterCallback<ClickEvent>(OnCreateGameClick);
-            Refresh.RegisterCallback<ClickEvent>(OnRefreshClick);
+            //Refresh.RegisterCallback<ClickEvent>(OnRefreshClick);
             Connect.RegisterCallback<ClickEvent>(OnConnectClick);
             Disconnect.RegisterCallback<ClickEvent>(OnDisconnectClick);
             visualTree.RegisterCallback<ClickEvent>(OnClick);
@@ -60,11 +57,12 @@ namespace Sibz.Sentry
 
         private async void OnClick(ClickEvent evt)
         {
-            if (evt.target is Button b && b.ClassListContains("destroy") && b.parent.parent.parent is VisualElement parent)
+            if (evt.target is Button b && b.ClassListContains("destroy") &&
+                b.parent.parent.parent is VisualElement parent)
             {
-                Debug.Log($"Destroying game {(int)parent.userData}");
+                Debug.Log($"Destroying game {(int) parent.userData}");
                 /*client.DestroyGame((int)parent.userData);*/
-                await RefreshList(0.5f);
+                //await RefreshList(0.5f);
             }
         }
 
@@ -89,12 +87,12 @@ namespace Sibz.Sentry
 
         private async void OnCreateGameClick(ClickEvent evt)
         {
-            /*client.CreateNewGame(GameName.text);*/
+            lobbyClient.CreateNewGame(GameName.text);
             GameName.value = "";
-            await RefreshList(0.2f);
+            //await RefreshList(0.2f);
         }
 
-        private async void OnRefreshClick(ClickEvent evt)
+        /*private async void OnRefreshClick(ClickEvent evt)
         {
             await RefreshList();
         }
@@ -104,10 +102,11 @@ namespace Sibz.Sentry
         {
             if (delay > 0f)
             {
-                var t  =new Task(() => Thread.Sleep((int)(delay*1000)));
+                var t = new Task(() => Thread.Sleep((int) (delay * 1000)));
                 t.Start();
                 await t;
             }
+
             if (!refreshList)
                 return;
             /*IEnumerable<GameInfoComponent> items = client.GetItems();
@@ -120,33 +119,43 @@ namespace Sibz.Sentry
                     l.text = gameInfoComponent.Name.ToString();
                 item.userData = gameInfoComponent.Id;
                 ListArea.Add(item);
-            }*/
+            }#1#
+        }*/
+
+        private void RefreshList()
+        {
+            foreach (GameInfoComponent gameInfoComponent in lobbyClient.Games)
+            {
+                VisualElement item = new VisualElement();
+                NewGameItemTemplate.CloneTree(item);
+                if (item.Q(null, "game-name") is Label l)
+                    l.text = gameInfoComponent.Name.ToString();
+                item.userData = gameInfoComponent.Id;
+                ListArea.Add(item);
+            }
         }
 
-        private ClientWorld CreateClientWorld()
+        private LobbyClient CreateClientWorld()
         {
-            ClientWorld world = new ClientWorld(new ClientOptions()
-            {
-                WorldName = "Lobby Client",
-                Port = 2165,
-                Address = "127.0.0.1",
-                GhostCollectionPrefab = Resources.Load<GameObject>("Collection")
-            });
+            LobbyClient world = new LobbyClient();
             world.Connected += i =>
             {
+                Debug.Log("Connected");
                 ConnectedArea.style.display = DisplayStyle.Flex;
                 NotConnectedArea.style.display = DisplayStyle.None;
             };
             world.Disconnected += () =>
             {
+                Debug.Log("Disconnected");
                 ConnectedArea.style.display = DisplayStyle.None;
                 NotConnectedArea.style.display = DisplayStyle.Flex;
                 ListArea.Clear();
-                clientWorld.Dispose();
-                clientWorld = null;
+                lobbyClient.DestroyWorld();
             };
+            world.WorldDestroyed += () => lobbyClient = null;
             world.Connecting += () => Debug.Log("Connecting...");
             world.ConnectionFailed += s => Debug.Log($"Connect Failed: {s}");
+            world.GameListUpdated += RefreshList;
             return world;
         }
 
@@ -154,14 +163,15 @@ namespace Sibz.Sentry
         {
             ListArea.Clear();
 
-            clientWorld = clientWorld ?? CreateClientWorld();
+            lobbyClient = lobbyClient ?? CreateClientWorld();
 
-            if (!clientWorld.World.IsCreated)
+            if (!lobbyClient.WorldIsCreated)
             {
-                clientWorld.CreateWorld();
+                lobbyClient.CreateWorld();
             }
 
-            clientWorld.Connect();
+            lobbyClient.Connect();
+
             /*client.CreateLobbyWorld();
             client.ConnectToServerLobby();
             await RefreshList(0.1f);
@@ -175,22 +185,35 @@ namespace Sibz.Sentry
                 }
             }).Start();*/
         }
+
         private async void OnDisconnectClick(ClickEvent evt)
         {
-            clientWorld.Disconnect();
+            lobbyClient.Disconnect();
         }
-
 
         private void OnDisable()
         {
             CreateGame.UnregisterCallback<ClickEvent>(OnCreateGameClick);
-            Refresh.UnregisterCallback<ClickEvent>(OnRefreshClick);
+            //Refresh.UnregisterCallback<ClickEvent>(OnRefreshClick);
             Connect.UnregisterCallback<ClickEvent>(OnConnectClick);
             runRefresh = false;
             refreshList = false;
-            if (refreshConnectionState!=null)
+            if (refreshConnectionState != null)
             {
                 StopCoroutine(refreshConnectionState);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (lobbyServer != null && lobbyServer.WorldIsCreated)
+            {
+                lobbyServer.Dispose();
+            }
+
+            if (lobbyClient != null && lobbyClient.WorldIsCreated)
+            {
+                lobbyClient.Dispose();
             }
         }
     }
