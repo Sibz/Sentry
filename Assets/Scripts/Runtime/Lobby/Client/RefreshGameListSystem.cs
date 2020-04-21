@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Sibz.NetCode;
 using Sibz.Sentry.Components;
 using Unity.Collections;
@@ -34,7 +34,7 @@ namespace Sibz.Sentry.Client
 
         protected override void OnUpdate()
         {
-            if (UnityEngine.Time.frameCount % 120 != 0)
+            if (UnityEngine.Time.frameCount % 30 != 0)
             {
                 return;
             }
