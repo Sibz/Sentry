@@ -1,0 +1,42 @@
+﻿using System;
+using Sibz.NetCode;
+using Sibz.Sentry.Components;
+using Unity.Collections;
+using Unity.Entities;
+
+namespace Sibz.Sentry.Client
+{
+    [ClientSystem]
+    [UpdateInGroup(typeof(InitializationSystemGroup))]
+    public class RefreshGameListSystem : SystemBase
+    {
+        public NativeList<GameInfoComponent> GameInfoComponents;
+        public Action GameListUpdated;
+
+        protected override void OnCreate()
+        {
+            GameInfoComponents = new NativeList<GameInfoComponent>(Allocator.Persistent);
+            base.OnCreate();
+        }
+
+        protected override void OnDestroy()
+        {
+            GameInfoComponents.Dispose();
+        }
+
+        protected override void OnUpdate()
+        {
+            if (UnityEngine.Time.frameCount % 30 != 0)
+            {
+                return;
+            }
+            GameInfoComponents.Clear();
+            NativeList<GameInfoComponent> gameInfoComponents = GameInfoComponents;
+            Entities.ForEach((ref GameInfoComponent gameInfoComponent) =>
+            {
+                gameInfoComponents.Add(gameInfoComponent);
+            }).Schedule(Dependency);
+            GameListUpdated?.Invoke();
+        }
+    }
+}

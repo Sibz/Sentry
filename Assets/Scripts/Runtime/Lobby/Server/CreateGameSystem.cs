@@ -1,4 +1,5 @@
-﻿using Sibz.Sentry.Components;
+﻿using Sibz.NetCode;
+using Sibz.Sentry.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -7,6 +8,7 @@ using UnityEngine;
 
 namespace Sibz.Sentry.Lobby.Server
 {
+    [ServerSystem]
     public class CreateGameSystem : JobComponentSystem
     {
         private Entity prefab;
@@ -22,10 +24,12 @@ namespace Sibz.Sentry.Lobby.Server
             public NativeArray<int> GameIds;
 
             public static void Execute(MyJoby joby, Entity entity, int index, ref CreateGameRequest rpc,
-            ref ReceiveRpcCommandRequestComponent req)
+                ref ReceiveRpcCommandRequestComponent req)
             {
                 var e = joby.Buffer.Instantiate(index, joby.Prefab);
-                joby.Buffer.SetComponent(index, e, new GameInfoComponent { Id = joby.GameIds[index], Name = rpc.Name, SizeX = rpc.Size.x, SizeY = rpc.Size.y});
+                joby.Buffer.SetComponent(index, e,
+                    new GameInfoComponent
+                        { Id = joby.GameIds[index], Name = rpc.Name, SizeX = rpc.Size.x, SizeY = rpc.Size.y });
                 joby.Buffer.DestroyEntity(index, entity);
             }
         }
@@ -52,6 +56,7 @@ namespace Sibz.Sentry.Lobby.Server
             {
                 return inputDeps;
             }
+
             if (prefab == Entity.Null)
             {
                 var prefabs = GetSingleton<GhostPrefabCollectionComponent>();
@@ -82,10 +87,11 @@ namespace Sibz.Sentry.Lobby.Server
             inputDeps = Entities.ForEach((Entity entity, int entityInQueryIndex, ref CreateGameRequest rpc,
                 ref ReceiveRpcCommandRequestComponent req) =>
             {
+                Debug.Log($"Server: Creating {rpc.Name}");
                 MyJoby.Execute(jobInfo, entity, entityInQueryIndex, ref rpc, ref req);
             }).Schedule(inputDeps);
 
-            inputDeps = new Dealloc {Ids = newIds}.Schedule(inputDeps);
+            inputDeps = new Dealloc { Ids = newIds }.Schedule(inputDeps);
 
             bufferSystem.AddJobHandleForProducer(inputDeps);
 
@@ -95,11 +101,11 @@ namespace Sibz.Sentry.Lobby.Server
         public struct GetNewGameIds : IJob
         {
             public NativeArray<int> Ids;
-            [DeallocateOnJobCompletion]
-            public NativeArray<GameInfoComponent> Infos;
+            [DeallocateOnJobCompletion] public NativeArray<GameInfoComponent> Infos;
+
             public void Execute()
             {
-                for (int i = 0; i < Ids.Length ; i++)
+                for (int i = 0; i < Ids.Length; i++)
                 {
                     for (int newId = 0; newId < int.MaxValue; newId++)
                     {
@@ -129,13 +135,11 @@ namespace Sibz.Sentry.Lobby.Server
 
         public struct Dealloc : IJob
         {
-             [DeallocateOnJobCompletion]
-             public NativeArray<int> Ids;
+            [DeallocateOnJobCompletion] public NativeArray<int> Ids;
 
-             public void Execute()
-             {
-
-             }
+            public void Execute()
+            {
+            }
         }
     }
 }

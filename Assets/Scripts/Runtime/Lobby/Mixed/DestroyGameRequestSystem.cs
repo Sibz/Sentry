@@ -1,11 +1,10 @@
 ﻿using Sibz.Lobby.Requests;
-using Unity.Entities;
+using Sibz.NetCode;
 using Unity.NetCode;
 
 namespace Sibz.Sentry.Lobby.Requests
 {
-    [DisableAutoCreation]
-    [UpdateInGroup(typeof(LobbyRpcRequestGroup))]
+    [ClientAndServerSystem]
     public class DestroyGameRequestSystem : RpcCommandRequestSystem<DestroyGameRequest>
     {
 

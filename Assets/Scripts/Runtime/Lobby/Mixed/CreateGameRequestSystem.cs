@@ -1,11 +1,11 @@
-﻿using Unity.Entities;
+﻿using Sibz.NetCode;
 using Unity.NetCode;
 
 namespace Sibz.Sentry.Lobby
 {
-    [DisableAutoCreation]
-    [UpdateInGroup(typeof(LobbyRpcRequestGroup))]
+    [ClientAndServerSystem]
     public class CreateGameRequestSystem : RpcCommandRequestSystem<CreateGameRequest>
     {
     }
+
 }

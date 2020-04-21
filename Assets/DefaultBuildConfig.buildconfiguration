@@ -1,31 +1,40 @@
 {
-    "Dependencies": [],
-    "Components": [{
-        "$type": "Unity.Build.Classic.ClassicBuildProfile, Unity.Build.Classic",
-        "Target": 19,
-        "Configuration": 2,
-        "Pipeline": "GlobalObjectId_V1-1-aae437a5d47e7834aa30de1fb576c0d4-93214019566545601-0",
-        "ExcludedAssemblies": []
-    }, {
-        "$type": "Unity.Build.Classic.ClassicScriptingSettings, Unity.Build.Classic",
-        "ScriptingBackend": 1,
-        "Il2CppCompilerConfiguration": 1,
-        "UseIncrementalGC": true
-    }, {
-        "$type": "Unity.Build.Common.GeneralSettings, Unity.Build.Common",
-        "ProductName": "Sentry",
-        "CompanyName": "EntityZero"
-    }, {
-        "$type": "Unity.Build.Common.OutputBuildDirectory, Unity.Build.Common",
-        "OutputDirectory": "Builds/Sentry"
-    }, {
-        "$type": "Unity.Build.Common.SceneList, Unity.Build.Common",
-        "BuildCurrentScene": false,
-        "SceneInfos": [{
-            "$type": "Unity.Build.Common.SceneList+SceneInfo, Unity.Build.Common",
-            "Scene": "GlobalObjectId_V1-1-a9f7b61bfeef7bb43bf5efb2afa5d5d1-102900000-0",
-            "AutoLoad": true
-        }],
-        "Scenes": []
-    }]
+    "Dependencies": [
+    ],
+    "Components": [
+        {
+            "$type": "Unity.Build.Classic.ClassicBuildProfile, Unity.Build.Classic",
+            "Target": 19,
+            "Configuration": 2,
+            "Pipeline": "GlobalObjectId_V1-1-aae437a5d47e7834aa30de1fb576c0d4-93214019566545601-0",
+            "ExcludedAssemblies": [
+            ]
+        },
+        {
+            "$type": "Unity.Build.Classic.ClassicScriptingSettings, Unity.Build.Classic",
+            "ScriptingBackend": 0,
+            "Il2CppCompilerConfiguration": 1,
+            "UseIncrementalGC": true
+        },
+        {
+            "$type": "Unity.Build.Common.GeneralSettings, Unity.Build.Common",
+            "ProductName": "Sentry",
+            "CompanyName": "EntityZero"
+        },
+        {
+            "$type": "Unity.Build.Common.OutputBuildDirectory, Unity.Build.Common",
+            "OutputDirectory": "Builds/Sentry"
+        },
+        {
+            "$type": "Unity.Build.Common.SceneList, Unity.Build.Common",
+            "$version": 1,
+            "BuildCurrentScene": false,
+            "SceneInfos": [
+                {
+                    "Scene": "GlobalObjectId_V1-1-a9f7b61bfeef7bb43bf5efb2afa5d5d1-102900000-0",
+                    "AutoLoad": true
+                }
+            ]
+        }
+    ]
 }
