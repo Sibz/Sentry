@@ -1,31 +1,33 @@
-﻿using Unity.Collections;
+﻿using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.NetCode;
 
 namespace Sibz.Sentry.Lobby.Server.Jobs
 {
-    public interface ICreateGameInfoJob<T>
-
-        where T: struct, IRpcCommand
+    [BurstCompile]
+    public struct CreateGameJob<TCreateGameRequest, TGameInfoComponent, TJobPart> : IJobParallelFor
+        where TCreateGameRequest : struct, IRpcCommand
+        where TGameInfoComponent : struct, IComponentData
+        where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest, TGameInfoComponent>
     {
-        void Execute(T data);
-    }
+        [ReadOnly][DeallocateOnJobCompletion] public NativeArray<TCreateGameRequest> CreateGameRpcRequests;
+        [ReadOnly][DeallocateOnJobCompletion] public NativeArray<int> NewGameIds;
+        public EntityCommandBuffer.Concurrent CommandBuffer;
+        public TJobPart CreateGameInfoJob;
+        public Entity Prefab;
 
-    public struct CreateGameJob<TCreateGameRequest, TJobPart> :IJobChunk
-    where TCreateGameRequest: struct, IRpcCommand
-    where TJobPart: struct, ICreateGameInfoJob<TCreateGameRequest>
-    {
-        [ReadOnly]
-        public ArchetypeChunkComponentType<TCreateGameRequest> CreateGameRpcRequests;
-        public TJobPart JobPart;
-
-        public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
+        public void Execute(int index)
         {
-            NativeArray<TCreateGameRequest> createGameRpcRequests = chunk.GetNativeArray(CreateGameRpcRequests);
-            for (int i = 0; i < chunk.Count; i++)
-            {
-                JobPart.Execute(createGameRpcRequests[i]);
-            }
+            int gameId = NewGameIds[index];
+            TGameInfoComponent gameInfoComponent =
+                CreateGameInfoJob.ConvertRequestToComponent(CreateGameRpcRequests[index], gameId);
+            GameIdComponent gameIdComponent = new GameIdComponent { Id = gameId };
+
+            Entity newGameEntity = CommandBuffer.Instantiate(index, Prefab);
+            CommandBuffer.SetComponent(index, newGameEntity, gameInfoComponent);
+            CommandBuffer.AddComponent(index, newGameEntity, gameIdComponent);
         }
     }
 }
