@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Sibz.NetCode;
 using Sibz.Sentry.Components;
 using Unity.Collections;
@@ -8,8 +8,7 @@ using Unity.NetCode;
 namespace Sibz.Sentry.Client
 {
     [ClientSystem]
-    [UpdateInWorld(UpdateInWorld.TargetWorld.Client)]
-    [UpdateInGroup(typeof(InitializationSystemGroup))]
+    [UpdateInGroup(typeof(PresentationSystemGroup))]
     public class RefreshGameListSystem : SystemBase
     {
         public NativeList<GameInfoComponent> GameInfoComponents;
