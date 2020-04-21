@@ -1,4 +1,5 @@
 ﻿using System;
+using Sibz.Lobby.Requests;
 using Sibz.NetCode;
 using Sibz.Sentry.Components;
 using Sibz.Sentry.Lobby;
@@ -31,6 +32,11 @@ namespace Sibz.Sentry.Client
         public void CreateNewGame(string name)
         {
             World.CreateRpcRequest(new CreateGameRequest { Name = name, Size = new int2(3, 3) });
+        }
+
+        public void DestroyGame(int gameId)
+        {
+            World.CreateRpcRequest(new DestroyGameRequest { Id = gameId });
         }
     }
 }

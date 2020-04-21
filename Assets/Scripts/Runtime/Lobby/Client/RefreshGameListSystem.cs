@@ -26,9 +26,15 @@ namespace Sibz.Sentry.Client
             GameInfoComponents.Dispose();
         }
 
+        protected override void OnStopRunning()
+        {
+            GameInfoComponents.Clear();
+            GameListUpdated?.Invoke();
+        }
+
         protected override void OnUpdate()
         {
-            if (UnityEngine.Time.frameCount % 30 != 0)
+            if (UnityEngine.Time.frameCount % 120 != 0)
             {
                 return;
             }

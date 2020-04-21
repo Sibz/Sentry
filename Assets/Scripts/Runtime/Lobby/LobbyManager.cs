@@ -47,7 +47,7 @@ namespace Sibz.Sentry
             //Refresh.RegisterCallback<ClickEvent>(OnRefreshClick);
             Connect.RegisterCallback<ClickEvent>(OnConnectClick);
             Disconnect.RegisterCallback<ClickEvent>(OnDisconnectClick);
-            visualTree.RegisterCallback<ClickEvent>(OnClick);
+            /*visualTree.RegisterCallback<ClickEvent>(OnClick);*/
             ConnectedArea.style.display = DisplayStyle.None;
             NotConnectedArea.style.display = DisplayStyle.None;
             runRefresh = true;
@@ -55,16 +55,16 @@ namespace Sibz.Sentry
             //refreshConnectionState = StartCoroutine(CheckLobbyConnectionState());
         }
 
-        private async void OnClick(ClickEvent evt)
+        /*private void OnClick(ClickEvent evt)
         {
             if (evt.target is Button b && b.ClassListContains("destroy") &&
                 b.parent.parent.parent is VisualElement parent)
             {
                 Debug.Log($"Destroying game {(int) parent.userData}");
-                /*client.DestroyGame((int)parent.userData);*/
+                lobbyClient.DestroyGame((int)parent.userData);
                 //await RefreshList(0.5f);
             }
-        }
+        }*/
 
         private IEnumerator CheckLobbyConnectionState()
         {
@@ -131,7 +131,13 @@ namespace Sibz.Sentry
                 NewGameItemTemplate.CloneTree(item);
                 if (item.Q(null, "game-name") is Label l)
                     l.text = gameInfoComponent.Name.ToString();
-                item.userData = gameInfoComponent.Id;
+
+                if (item.Q<Button>(null, "destroy") is Button b)
+                {
+                    b.RegisterCallback<ClickEvent>((e)=> lobbyClient.DestroyGame(gameInfoComponent.Id));
+                    //await RefreshList(0.5f);
+                }
+                //item.userData = gameInfoComponent.Id;
                 ListArea.Add(item);
             }
         }
