@@ -9,7 +9,6 @@ using UnityEngine;
 namespace Sibz.Sentry.Lobby.Server
 {
     [ServerSystem]
-    [UpdateInWorld(UpdateInWorld.TargetWorld.Server)]
     public class CreateGameSystem : JobComponentSystem
     {
         private Entity prefab;

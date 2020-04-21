@@ -24,13 +24,13 @@ namespace Sibz.Sentry.Lobby.Server
 
             ClientConnected += entity =>
             {
-                var ghostCollection = World.EntityManager.CreateEntityQuery(typeof(GhostPrefabCollectionComponent)).GetSingleton<GhostPrefabCollectionComponent>();
+                /*var ghostCollection = World.EntityManager.CreateEntityQuery(typeof(GhostPrefabCollectionComponent)).GetSingleton<GhostPrefabCollectionComponent>();
                 var ghostId = SentryGhostSerializerCollection.FindGhostType<LobbyConnectionGhostSnapshotData>();
                 var prefab = World.EntityManager.GetBuffer<GhostPrefabBuffer>(ghostCollection.serverPrefabs)[ghostId].Value;
                 var player = World.EntityManager.Instantiate(prefab);
                 World.EntityManager.SetComponentData(player, new LobbyClientConnection() { ConnectionId = World.EntityManager.GetComponentData<NetworkIdComponent>(entity).Value});
 
-                World.EntityManager.SetComponentData(entity, new CommandTargetComponent {targetEntity = player});
+                World.EntityManager.SetComponentData(entity, new CommandTargetComponent {targetEntity = player});*/
             };
             CreateWorld();
             Listen();

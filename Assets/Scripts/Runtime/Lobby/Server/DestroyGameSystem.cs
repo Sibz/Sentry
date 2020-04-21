@@ -10,7 +10,6 @@ using Unity.NetCode;
 namespace Sibz.Sentry.Lobby.Server
 {
     [ServerSystem]
-    [UpdateInWorld(UpdateInWorld.TargetWorld.Server)]
     public class DestroyGameSystem : JobComponentSystem
     {
         private EndSimulationEntityCommandBufferSystem bufferSystem;
