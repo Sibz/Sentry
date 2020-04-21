@@ -9,6 +9,7 @@ using UnityEngine;
 namespace Sibz.Sentry.Lobby.Server
 {
     [ServerSystem]
+    [UpdateInWorld(UpdateInWorld.TargetWorld.Server)]
     public class CreateGameSystem : JobComponentSystem
     {
         private Entity prefab;
@@ -87,7 +88,7 @@ namespace Sibz.Sentry.Lobby.Server
             inputDeps = Entities.ForEach((Entity entity, int entityInQueryIndex, ref CreateGameRequest rpc,
                 ref ReceiveRpcCommandRequestComponent req) =>
             {
-                Debug.Log($"Server: Creating {rpc.Name}");
+                //Debug.Log($"Server: Creating {rpc.Name}");
                 MyJoby.Execute(jobInfo, entity, entityInQueryIndex, ref rpc, ref req);
             }).Schedule(inputDeps);
 

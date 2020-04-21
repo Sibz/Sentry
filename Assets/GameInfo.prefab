@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabId: 563bb26dcde2b1440895fafe0726479c
   DefaultClientInstantiationType: 0
-  RootPath: Scripts\Runtime\Resources\Generated
+  RootPath: Scripts\Runtime\Generated
   SnapshotDataPath: GameInfoSnapshotData.cs
   UpdateSystemPath: GameInfoGhostUpdateSystem.cs
   SerializerPath: GameInfoGhostSerializer.cs

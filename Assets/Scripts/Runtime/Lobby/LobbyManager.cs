@@ -124,6 +124,7 @@ namespace Sibz.Sentry
 
         private void RefreshList()
         {
+            ListArea.Clear();
             foreach (GameInfoComponent gameInfoComponent in lobbyClient.Games)
             {
                 VisualElement item = new VisualElement();

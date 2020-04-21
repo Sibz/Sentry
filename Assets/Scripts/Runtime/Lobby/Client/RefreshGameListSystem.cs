@@ -3,10 +3,12 @@ using Sibz.NetCode;
 using Sibz.Sentry.Components;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.NetCode;
 
 namespace Sibz.Sentry.Client
 {
     [ClientSystem]
+    [UpdateInWorld(UpdateInWorld.TargetWorld.Client)]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public class RefreshGameListSystem : SystemBase
     {
@@ -35,7 +37,7 @@ namespace Sibz.Sentry.Client
             Entities.ForEach((ref GameInfoComponent gameInfoComponent) =>
             {
                 gameInfoComponents.Add(gameInfoComponent);
-            }).Schedule(Dependency);
+            }).Schedule(Dependency).Complete();
             GameListUpdated?.Invoke();
         }
     }
