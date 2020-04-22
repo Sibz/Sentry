@@ -1,8 +1,7 @@
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using Unity.Collections;
 using Unity.NetCode;
-using Sibz.Sentry;
+using Sibz.Sentry.Lobby;
 
 public struct LobbyConnectionGhostGhostSerializer : IGhostSerializer<LobbyConnectionGhostSnapshotData>
 {

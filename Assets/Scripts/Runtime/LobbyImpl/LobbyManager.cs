@@ -1,20 +1,23 @@
-﻿using System;
-using System.Collections;
-using System.Threading;
-using System.Threading.Tasks;
-using Sibz.NetCode;
-using Sibz.NetCode.WorldExtensions;
-using Sibz.Sentry.Client;
+﻿using System.Collections;
+using Sibz.Lobby.Client;
+using Sibz.Lobby.Requests;
+using Sibz.Lobby.Server;
 using Sibz.Sentry.Components;
-using Sibz.Sentry.Lobby.Server;
-using Unity.Entities;
+using Unity.Mathematics;
 using Unity.UIElements.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Sibz.Sentry
+namespace Sibz.Sentry.Lobby
 {
-    public class LobbyManager : MonoBehaviour
+    public class MyLobbyClient : LobbyClient<GameInfoComponent>
+    {
+        public void CreateNewGame(string name)
+        {
+            World.CreateRpcRequest(new CreateGameRequest { Name = name, Size = new int2(3, 3) });
+        }
+    }
+    internal class LobbyManager : MonoBehaviour
     {
         public VisualTreeAsset NewGameItemTemplate;
 
@@ -35,7 +38,7 @@ namespace Sibz.Sentry
         private Coroutine refreshConnectionState;
 
         private LobbyServer lobbyServer;
-        private LobbyClient lobbyClient;
+        private MyLobbyClient lobbyClient;
 
         // Start is called before the first frame update
         void Start()
@@ -142,9 +145,9 @@ namespace Sibz.Sentry
             }
         }
 
-        private LobbyClient CreateClientWorld()
+        private MyLobbyClient CreateClientWorld()
         {
-            LobbyClient world = new LobbyClient();
+            MyLobbyClient world = new MyLobbyClient();
             world.Connected += i =>
             {
                 Debug.Log("Connected");

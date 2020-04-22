@@ -1,29 +1,17 @@
 ﻿using System;
-using Sibz.NetCode;
-using Sibz.Sentry.Components;
-using Sibz.Sentry.Lobby.Server.Jobs;
+using Sibz.Lobby.Server.Jobs;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.NetCode;
 
-namespace Sibz.Sentry.Lobby.Server
+namespace Sibz.Lobby.Server
 {
-    [ServerSystem]
-    public class MyCreateGameSystem : CreateGameSystem<CreateGameRequest, CreateGameInfoJob>
-    {
-        protected override int GetPrefabIndex()
-        {
-            return SentryGhostSerializerCollection.FindGhostType<GameInfoSnapshotData>();
-        }
-    }
-
     public abstract class CreateGameSystem<TCreateGameRequest, TCreateGameInfoJob> : SystemBase
         where TCreateGameRequest : struct, IRpcCommand
         where TCreateGameInfoJob : struct, ICreateGameInfoJob<TCreateGameRequest>
     {
         private Entity prefab;
-
         private EntityQuery required;
         private EntityQuery gameIdsQuery;
         private EndSimulationEntityCommandBufferSystem bufferSystem;

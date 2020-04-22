@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace Sibz.Sentry.Lobby.Server
+namespace Sibz.Lobby.Server
 {
     public struct GameIdComponent : IComponentData
     {

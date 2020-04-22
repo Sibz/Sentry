@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-namespace Sibz.Sentry
+namespace Sibz.Sentry.Lobby
 {
     [GenerateAuthoringComponent]
     public struct LobbyClientConnection : IComponentData

@@ -1,10 +1,8 @@
 ﻿using Sibz.Lobby.Requests;
-using Sibz.Sentry.Components;
-using Sibz.Sentry.Lobby.Requests;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace Sibz.Sentry.Lobby.Server.Jobs
+namespace Sibz.Lobby.Server.Jobs
 {
     public struct DestroyGameJob
     {
@@ -30,7 +28,7 @@ namespace Sibz.Sentry.Lobby.Server.Jobs
 
             public EntityCommandBuffer.Concurrent CmdBuffer;
             public NativeArray<Entity> GameEntities;
-            public NativeArray<GameInfoComponent> GameInfos;
+            public NativeArray<GameIdComponent> GameIds;
 
 
         public void  Execute(Entity reqEntity, int index, ref DestroyGameRequest rpc)
@@ -47,9 +45,9 @@ namespace Sibz.Sentry.Lobby.Server.Jobs
         private bool TryGetEntityToDestroy(int id, out Entity entity)
         {
             entity = Entity.Null;
-            for (int i = 0; i < GameInfos.Length; i++)
+            for (int i = 0; i < GameIds.Length; i++)
             {
-                if (GameInfos[i].Id != id)
+                if (GameIds[i].Id != id)
                 {
                     continue;
                 }

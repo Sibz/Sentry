@@ -1,7 +1,7 @@
 ﻿using Unity.Collections;
 using Unity.Jobs;
 
-namespace Sibz.Sentry.Lobby.Server.Jobs
+namespace Sibz.Lobby.Server.Jobs
 {
     public struct GetNewGameIdsJob : IJob
     {

@@ -2,7 +2,7 @@
 using Unity.Entities;
 using Unity.NetCode;
 
-namespace Sibz.Sentry.Lobby.Server.Jobs
+namespace Sibz.Lobby.Server.Jobs
 {
     public interface ICreateGameInfoJob<in TCreateGameRequest>
         where TCreateGameRequest : struct, IRpcCommand

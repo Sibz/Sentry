@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.NetCode;
 
-namespace Sibz.Sentry.Lobby.Server.Jobs
+namespace Sibz.Lobby.Server.Jobs
 {
     [BurstCompile]
     public struct CreateGameJob<TCreateGameRequest, TCreateGameInfoJob> : IJobParallelFor

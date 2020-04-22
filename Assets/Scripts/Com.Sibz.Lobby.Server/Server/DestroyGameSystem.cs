@@ -1,13 +1,12 @@
 ﻿using Sibz.Lobby.Requests;
+using Sibz.Lobby.Server.Jobs;
 using Sibz.NetCode;
-using Sibz.Sentry.Components;
-using Sibz.Sentry.Lobby.Server.Jobs;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.NetCode;
 
-namespace Sibz.Sentry.Lobby.Server
+namespace Sibz.Lobby.Server
 {
     [ServerSystem]
     public class DestroyGameSystem : JobComponentSystem
@@ -22,7 +21,7 @@ namespace Sibz.Sentry.Lobby.Server
             bufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
             requiredToRunQuery = GetEntityQuery(typeof(DestroyGameRequest), typeof(ReceiveRpcCommandRequestComponent));
             RequireForUpdate(requiredToRunQuery);
-            gameInfosQuery = GetEntityQuery(typeof(GameInfoComponent));
+            gameInfosQuery = GetEntityQuery(typeof(GameIdComponent));
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
@@ -31,7 +30,7 @@ namespace Sibz.Sentry.Lobby.Server
             {
                 CmdBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent(),
                 GameEntities = gameInfosQuery.ToEntityArrayAsync(Allocator.TempJob, out JobHandle jh1),
-                GameInfos = gameInfosQuery.ToComponentDataArrayAsync<GameInfoComponent>(Allocator.TempJob,
+                GameIds = gameInfosQuery.ToComponentDataArrayAsync<GameIdComponent>(Allocator.TempJob,
                     out JobHandle jh2)
             };
 
@@ -48,7 +47,7 @@ namespace Sibz.Sentry.Lobby.Server
 
             inputDeps =
                 new Dealloc()
-                    { GameEntities = jobData.GameEntities, GameInfos = jobData.GameInfos }.Schedule(inputDeps);
+                    { GameEntities = jobData.GameEntities, GameInfos = jobData.GameIds }.Schedule(inputDeps);
 
             return inputDeps;
         }
@@ -56,7 +55,7 @@ namespace Sibz.Sentry.Lobby.Server
         public struct Dealloc : IJob
         {
             [DeallocateOnJobCompletion] public NativeArray<Entity> GameEntities;
-            [DeallocateOnJobCompletion] public NativeArray<GameInfoComponent> GameInfos;
+            [DeallocateOnJobCompletion] public NativeArray<GameIdComponent> GameInfos;
 
             public void Execute()
             {

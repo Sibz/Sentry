@@ -1,7 +1,9 @@
+using Sibz.Lobby.Requests;
+using Sibz.Lobby.Server.Jobs;
 using Sibz.Sentry.Components;
 using Unity.Entities;
 
-namespace Sibz.Sentry.Lobby.Server.Jobs
+namespace Sibz.Sentry.Lobby
 {
     public struct CreateGameInfoJob : ICreateGameInfoJob<CreateGameRequest>
     {
