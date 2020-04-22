@@ -10,6 +10,5 @@ namespace Sibz.Lobby
     [LobbyClientAndServerSystem]
     public class DestroyGameRequestSystem : RpcCommandRequestSystem<DestroyGameRequest>
     {
-
     }
 }

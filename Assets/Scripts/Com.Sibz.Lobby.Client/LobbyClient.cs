@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using Sibz.Lobby.Requests;
 using Sibz.NetCode;
 using Unity.Entities;
+using Unity.NetCode;
 using UnityEngine;
 
 [assembly: DisableAutoCreation]
 
 namespace Sibz.Lobby.Client
 {
-    public abstract class LobbyClient<TGameInfoComponent> : ClientWorld
+    public abstract class LobbyClient<TGameInfoComponent, TCreateGameRequest> : ClientWorld
     where TGameInfoComponent: struct, IComponentData
+    where TCreateGameRequest: struct, IRpcCommand
     {
         public class RefreshGameListSystem : RefreshGameListSystem<TGameInfoComponent>
         {
@@ -43,10 +45,10 @@ namespace Sibz.Lobby.Client
             };
         }
 
-        //public abstract void CreateNewGame(string name);
-        /*{
-            World.CreateRpcRequest(new CreateGameRequest { Name = name, Size = new int2(3, 3) });
-        }*/
+        public void CreateNewGame(TCreateGameRequest request)
+        {
+            World.CreateRpcRequest(request);
+        }
 
         public void DestroyGame(int gameId)
         {

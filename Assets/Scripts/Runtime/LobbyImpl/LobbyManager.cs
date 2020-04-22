@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using Sibz.Lobby.Client;
-using Sibz.Lobby.Requests;
 using Sibz.Lobby.Server;
 using Sibz.Sentry.Components;
 using Unity.Mathematics;
@@ -10,11 +9,11 @@ using UnityEngine.UIElements;
 
 namespace Sibz.Sentry.Lobby
 {
-    public class MyLobbyClient : LobbyClient<GameInfoComponent>
+    public class MyLobbyClient : LobbyClient<GameInfoComponent, CreateGameRequest>
     {
         public void CreateNewGame(string name)
         {
-            World.CreateRpcRequest(new CreateGameRequest { Name = name, Size = new int2(3, 3) });
+            base.CreateNewGame(new CreateGameRequest { Name = name, Size = new int2(3, 3) });
         }
     }
     internal class LobbyManager : MonoBehaviour
