@@ -20,10 +20,15 @@ namespace Sibz.Sentry.Lobby.Server.Jobs
         public void Execute(int index)
         {
             int gameId = NewGameIds[index];
+            TCreateGameRequest data = CreateGameRpcRequests[index];
             GameIdComponent gameIdComponent = new GameIdComponent { Id = gameId };
 
+            if (CreateGameInfoJob.ValidateRequest(data) != 0)
+            {
+                return;
+            }
             Entity newGameEntity = CommandBuffer.Instantiate(index, Prefab);
-            CreateGameInfoJob.SetGameInfoComponent(CommandBuffer, index, newGameEntity, CreateGameRpcRequests[index], gameId);
+            CreateGameInfoJob.SetGameInfoComponent(CommandBuffer, index, newGameEntity, data, gameId);
             CommandBuffer.SetComponent(index, newGameEntity, gameIdComponent);
         }
     }

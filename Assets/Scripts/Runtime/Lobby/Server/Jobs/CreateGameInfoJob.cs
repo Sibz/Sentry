@@ -1,4 +1,4 @@
-﻿using Sibz.Sentry.Components;
+using Sibz.Sentry.Components;
 using Unity.Entities;
 
 namespace Sibz.Sentry.Lobby.Server.Jobs
@@ -19,6 +19,11 @@ namespace Sibz.Sentry.Lobby.Server.Jobs
         public void SetGameInfoComponent(EntityCommandBuffer.Concurrent commandBuffer, int index, Entity entity, CreateGameRequest data, int gameId)
         {
             commandBuffer.SetComponent(index, entity, ConvertRequestToComponent(data, gameId));
+        }
+
+        public int ValidateRequest(CreateGameRequest data)
+        {
+            return data.Name.Equals(default) ? 1 : 0;
         }
     }
 }
