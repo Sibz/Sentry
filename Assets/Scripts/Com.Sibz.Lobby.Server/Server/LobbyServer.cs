@@ -30,8 +30,15 @@ namespace Sibz.Lobby.Server
                 ListenSuccess += onListen;
             }
 
+            WorldCreated += () =>
+            {
+                World.EntityManager.CreateEntity(
+                    World.EntityManager.CreateArchetype(ComponentType.ReadOnly<LobbyAclBufferItem>()));
+            };
+
             ClientConnected += entity =>
             {
+                World.EntityManager.AddComponent<LobbyUser>(entity);
                 /*var ghostCollection = World.EntityManager.CreateEntityQuery(typeof(GhostPrefabCollectionComponent)).GetSingleton<GhostPrefabCollectionComponent>();
                 var ghostId = SentryGhostSerializerCollection.FindGhostType<LobbyConnectionGhostSnapshotData>();
                 var prefab = World.EntityManager.GetBuffer<GhostPrefabBuffer>(ghostCollection.serverPrefabs)[ghostId].Value;
