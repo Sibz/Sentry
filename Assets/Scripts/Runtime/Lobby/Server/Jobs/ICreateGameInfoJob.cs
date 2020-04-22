@@ -3,10 +3,11 @@ using Unity.NetCode;
 
 namespace Sibz.Sentry.Lobby.Server.Jobs
 {
-    public interface ICreateGameInfoJob<in TCreateGameRequest, out TGameInfoComponent>
+    public interface ICreateGameInfoJob<in TCreateGameRequest>
         where TCreateGameRequest : struct, IRpcCommand
-        where TGameInfoComponent : struct, IComponentData
     {
-        TGameInfoComponent ConvertRequestToComponent(TCreateGameRequest data, int gameId);
+
+        void SetGameInfoComponent(EntityCommandBuffer.Concurrent commandBuffer, int index, Entity entity,
+            TCreateGameRequest data, int gameId);
     }
 }

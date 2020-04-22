@@ -7,10 +7,11 @@ using Unity.NetCode;
 namespace Sibz.Sentry.Lobby.Server.Jobs
 {
     [BurstCompile]
-    public struct CreateGameJob<TCreateGameRequest, TGameInfoComponent, TJobPart> : IJobParallelFor
+    public struct CreateGameJob<TCreateGameRequest/*, TGameInfoComponent*/, TJobPart> : IJobParallelFor
         where TCreateGameRequest : struct, IRpcCommand
-        where TGameInfoComponent : struct, IComponentData
-        where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest, TGameInfoComponent>
+        /*where TGameInfoComponent : struct, IComponentData*/
+        where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest>
+        //where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest, TGameInfoComponent>
     {
         [ReadOnly][DeallocateOnJobCompletion] public NativeArray<TCreateGameRequest> CreateGameRpcRequests;
         [ReadOnly][DeallocateOnJobCompletion] public NativeArray<int> NewGameIds;
@@ -21,12 +22,13 @@ namespace Sibz.Sentry.Lobby.Server.Jobs
         public void Execute(int index)
         {
             int gameId = NewGameIds[index];
-            TGameInfoComponent gameInfoComponent =
-                CreateGameInfoJob.ConvertRequestToComponent(CreateGameRpcRequests[index], gameId);
+            /*TGameInfoComponent gameInfoComponent =
+                CreateGameInfoJob.ConvertRequestToComponent(CreateGameRpcRequests[index], gameId);*/
             GameIdComponent gameIdComponent = new GameIdComponent { Id = gameId };
 
             Entity newGameEntity = CommandBuffer.Instantiate(index, Prefab);
-            CommandBuffer.SetComponent(index, newGameEntity, gameInfoComponent);
+            /*CommandBuffer.SetComponent(index, newGameEntity, gameInfoComponent);*/
+            CreateGameInfoJob.SetGameInfoComponent(CommandBuffer, index, newGameEntity, CreateGameRpcRequests[index], gameId);
             CommandBuffer.SetComponent(index, newGameEntity, gameIdComponent);
         }
     }

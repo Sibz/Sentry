@@ -10,7 +10,7 @@ using Unity.NetCode;
 namespace Sibz.Sentry.Lobby.Server
 {
     [ServerSystem]
-    public class MyCreateGameSystem : CreateGameSystem<CreateGameRequest, GameInfoComponent, CreateGameInfoJob>
+    public class MyCreateGameSystem : CreateGameSystem<CreateGameRequest, CreateGameInfoJob>
     {
         protected override int GetPrefabIndex()
         {
@@ -18,10 +18,10 @@ namespace Sibz.Sentry.Lobby.Server
         }
     }
 
-    public abstract class CreateGameSystem<TCreateGameRequest, TGameInfoComponent, TJobPart> : SystemBase
+    public abstract class CreateGameSystem<TCreateGameRequest, TJobPart> : SystemBase
         where TCreateGameRequest : struct, IRpcCommand
-        where TGameInfoComponent : struct, IComponentData
-        where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest, TGameInfoComponent>
+        /*where TGameInfoComponent : struct, IComponentData*/
+        where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest>
     {
         private Entity prefab;
 
@@ -92,7 +92,7 @@ namespace Sibz.Sentry.Lobby.Server
                 GameIds = gameIdsQuery.ToComponentDataArrayAsync<GameIdComponent>(Allocator.TempJob, out JobHandle jh1)
             }.Schedule(JobHandle.CombineDependencies(Dependency, jh1));
 
-            Dependency = new CreateGameJob<TCreateGameRequest, TGameInfoComponent, TJobPart>
+            Dependency = new CreateGameJob<TCreateGameRequest, TJobPart>
             {
                 Prefab = prefab,
                 NewGameIds = newIds,
