@@ -32,14 +32,9 @@ namespace Sibz.Sentry.Lobby
 
         private VisualElement ListArea => visualTree?.Q("ListArea");
 
-        private bool runRefresh;
-        private bool refreshList;
-        private Coroutine refreshConnectionState;
-
         private LobbyServer lobbyServer;
         private MyLobbyClient lobbyClient;
 
-        // Start is called before the first frame update
         void Start()
         {
             lobbyServer = new LobbyServer(()=>
@@ -49,80 +44,16 @@ namespace Sibz.Sentry.Lobby
             //Refresh.RegisterCallback<ClickEvent>(OnRefreshClick);
             Connect.RegisterCallback<ClickEvent>(OnConnectClick);
             Disconnect.RegisterCallback<ClickEvent>(OnDisconnectClick);
-            /*visualTree.RegisterCallback<ClickEvent>(OnClick);*/
             ConnectedArea.style.display = DisplayStyle.None;
             NotConnectedArea.style.display = DisplayStyle.None;
-            runRefresh = true;
 
-            //refreshConnectionState = StartCoroutine(CheckLobbyConnectionState());
         }
 
-        /*private void OnClick(ClickEvent evt)
-        {
-            if (evt.target is Button b && b.ClassListContains("destroy") &&
-                b.parent.parent.parent is VisualElement parent)
-            {
-                Debug.Log($"Destroying game {(int) parent.userData}");
-                lobbyClient.DestroyGame((int)parent.userData);
-                //await RefreshList(0.5f);
-            }
-        }*/
-
-        private IEnumerator CheckLobbyConnectionState()
-        {
-            while (runRefresh)
-            {
-                yield return new WaitForSeconds(0.2f);
-                /*if (client.IsConnected)
-                {
-                    ConnectedArea.style.display = DisplayStyle.Flex;
-                    NotConnectedArea.style.display = DisplayStyle.None;
-                }
-                else
-                {
-                    ConnectedArea.style.display = DisplayStyle.None;
-                    NotConnectedArea.style.display = DisplayStyle.Flex;
-                    refreshList = false;
-                }*/
-            }
-        }
-
-        private async void OnCreateGameClick(ClickEvent evt)
+        private void OnCreateGameClick(ClickEvent evt)
         {
             lobbyClient.CreateNewGame(GameName.text);
             GameName.value = "";
-            //await RefreshList(0.2f);
         }
-
-        /*private async void OnRefreshClick(ClickEvent evt)
-        {
-            await RefreshList();
-        }
-
-
-        private async Task RefreshList(float delay = 0f)
-        {
-            if (delay > 0f)
-            {
-                var t = new Task(() => Thread.Sleep((int) (delay * 1000)));
-                t.Start();
-                await t;
-            }
-
-            if (!refreshList)
-                return;
-            /*IEnumerable<GameInfoComponent> items = client.GetItems();
-            ListArea.Clear();
-            foreach (GameInfoComponent gameInfoComponent in items)
-            {
-                VisualElement item = new VisualElement();
-                NewGameItemTemplate.CloneTree(item);
-                if (item.Q(null, "game-name") is Label l)
-                    l.text = gameInfoComponent.Name.ToString();
-                item.userData = gameInfoComponent.Id;
-                ListArea.Add(item);
-            }#1#
-        }*/
 
         private void RefreshList()
         {
@@ -137,9 +68,7 @@ namespace Sibz.Sentry.Lobby
                 if (item.Q<Button>(null, "destroy") is Button b)
                 {
                     b.RegisterCallback<ClickEvent>((e)=> lobbyClient.DestroyGame(gameInfoComponent.Id));
-                    //await RefreshList(0.5f);
                 }
-                //item.userData = gameInfoComponent.Id;
                 ListArea.Add(item);
             }
         }
@@ -168,7 +97,7 @@ namespace Sibz.Sentry.Lobby
             return world;
         }
 
-        private async void OnConnectClick(ClickEvent evt)
+        private void OnConnectClick(ClickEvent evt)
         {
             ListArea.Clear();
 
@@ -180,22 +109,9 @@ namespace Sibz.Sentry.Lobby
             }
 
             lobbyClient.Connect();
-
-            /*client.CreateLobbyWorld();
-            client.ConnectToServerLobby();
-            await RefreshList(0.1f);
-            await RefreshList(0.5f);
-            refreshList = true;
-            new Task(async () =>
-            {
-                while (refreshList)
-                {
-                    await RefreshList(1f);
-                }
-            }).Start();*/
         }
 
-        private async void OnDisconnectClick(ClickEvent evt)
+        private void OnDisconnectClick(ClickEvent evt)
         {
             lobbyClient.Disconnect();
         }
@@ -203,14 +119,7 @@ namespace Sibz.Sentry.Lobby
         private void OnDisable()
         {
             CreateGame.UnregisterCallback<ClickEvent>(OnCreateGameClick);
-            //Refresh.UnregisterCallback<ClickEvent>(OnRefreshClick);
             Connect.UnregisterCallback<ClickEvent>(OnConnectClick);
-            runRefresh = false;
-            refreshList = false;
-            if (refreshConnectionState != null)
-            {
-                StopCoroutine(refreshConnectionState);
-            }
         }
 
         private void OnDestroy()
