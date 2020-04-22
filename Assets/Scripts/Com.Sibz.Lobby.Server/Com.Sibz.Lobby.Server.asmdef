@@ -1,5 +1,5 @@
 {
-    "name": "NewAssembly",
+    "name": "Com.Sibz.Lobby.Server",
     "references": [
         "GUID:55b0ab6c5efb9b8448b48f903694be31",
         "GUID:9481855938e3f594f948d6b3eb93e9c6",
