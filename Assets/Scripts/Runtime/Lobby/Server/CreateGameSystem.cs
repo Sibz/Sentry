@@ -18,9 +18,9 @@ namespace Sibz.Sentry.Lobby.Server
         }
     }
 
-    public abstract class CreateGameSystem<TCreateGameRequest, TJobPart> : SystemBase
+    public abstract class CreateGameSystem<TCreateGameRequest, TCreateGameInfoJob> : SystemBase
         where TCreateGameRequest : struct, IRpcCommand
-        where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest>
+        where TCreateGameInfoJob : struct, ICreateGameInfoJob<TCreateGameRequest>
     {
         private Entity prefab;
 
@@ -91,7 +91,7 @@ namespace Sibz.Sentry.Lobby.Server
                 GameIds = gameIdsQuery.ToComponentDataArrayAsync<GameIdComponent>(Allocator.TempJob, out JobHandle jh1)
             }.Schedule(JobHandle.CombineDependencies(Dependency, jh1));
 
-            Dependency = new CreateGameJob<TCreateGameRequest, TJobPart>
+            Dependency = new CreateGameJob<TCreateGameRequest, TCreateGameInfoJob>
             {
                 Prefab = prefab,
                 NewGameIds = newIds,

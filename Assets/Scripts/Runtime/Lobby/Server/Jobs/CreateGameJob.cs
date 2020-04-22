@@ -7,14 +7,14 @@ using Unity.NetCode;
 namespace Sibz.Sentry.Lobby.Server.Jobs
 {
     [BurstCompile]
-    public struct CreateGameJob<TCreateGameRequest, TJobPart> : IJobParallelFor
+    public struct CreateGameJob<TCreateGameRequest, TCreateGameInfoJob> : IJobParallelFor
         where TCreateGameRequest : struct, IRpcCommand
-        where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest>
+        where TCreateGameInfoJob : struct, ICreateGameInfoJob<TCreateGameRequest>
     {
         [ReadOnly][DeallocateOnJobCompletion] public NativeArray<TCreateGameRequest> CreateGameRpcRequests;
         [ReadOnly][DeallocateOnJobCompletion] public NativeArray<int> NewGameIds;
         public EntityCommandBuffer.Concurrent CommandBuffer;
-        public TJobPart CreateGameInfoJob;
+        public TCreateGameInfoJob CreateGameInfoJob;
         public Entity Prefab;
 
         public void Execute(int index)
