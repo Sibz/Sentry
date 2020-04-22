@@ -20,7 +20,6 @@ namespace Sibz.Sentry.Lobby.Server
 
     public abstract class CreateGameSystem<TCreateGameRequest, TJobPart> : SystemBase
         where TCreateGameRequest : struct, IRpcCommand
-        /*where TGameInfoComponent : struct, IComponentData*/
         where TJobPart : struct, ICreateGameInfoJob<TCreateGameRequest>
     {
         private Entity prefab;
