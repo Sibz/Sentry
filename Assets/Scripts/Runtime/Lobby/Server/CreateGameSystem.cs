@@ -29,7 +29,26 @@ namespace Sibz.Sentry.Lobby.Server
         private EntityQuery gameIdsQuery;
         private EndSimulationEntityCommandBufferSystem bufferSystem;
 
-        protected abstract int GetPrefabIndex();
+        protected virtual int GetPrefabIndex()
+        {
+            return -1;
+        }
+
+        protected virtual Entity GetPrefab()
+        {
+            int index = GetPrefabIndex();
+            if (index == -1)
+            {
+                throw new InvalidOperationException("When using ghost object prefab, must override GetPrefabIndex" +
+                                                    " to provide the index of prefab in ghost collection\n" +
+                                                    "i.e. GhostSerializerCollection.FindGhostType<SnapshotData>()");
+            }
+            GhostPrefabCollectionComponent prefabs =
+                GetEntityQuery(typeof(GhostPrefabCollectionComponent)).GetSingleton<GhostPrefabCollectionComponent>();
+            DynamicBuffer<GhostPrefabBuffer> serverPrefabs =
+                EntityManager.GetBuffer<GhostPrefabBuffer>(prefabs.serverPrefabs);
+            return serverPrefabs[GetPrefabIndex()].Value;
+        }
 
         protected override void OnCreate()
         {
@@ -49,21 +68,20 @@ namespace Sibz.Sentry.Lobby.Server
 
         protected override void OnStartRunning()
         {
-            if (prefab == Entity.Null)
+            if (prefab != Entity.Null)
             {
-                var prefabs = GetEntityQuery(typeof(GhostPrefabCollectionComponent)).GetSingleton<GhostPrefabCollectionComponent>();
-                var serverPrefabs = EntityManager.GetBuffer<GhostPrefabBuffer>(prefabs.serverPrefabs);
-                prefab = serverPrefabs[GetPrefabIndex()].Value;
+                return;
+            }
+
+            prefab = GetPrefab();
+            if (!EntityManager.HasComponent<GameIdComponent>(prefab))
+            {
+                EntityManager.AddComponent<GameIdComponent>(prefab);
             }
         }
 
         protected override void OnUpdate()
         {
-            if (!HasSingleton<GhostPrefabCollectionComponent>())
-            {
-                throw new InvalidOperationException("No Ghost Collection loaded!");
-            }
-
             EntityCommandBuffer.Concurrent commandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
 
             NativeArray<int> newIds = new NativeArray<int>(required.CalculateEntityCount(), Allocator.TempJob);

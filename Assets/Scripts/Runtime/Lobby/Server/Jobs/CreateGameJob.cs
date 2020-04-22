@@ -27,7 +27,7 @@ namespace Sibz.Sentry.Lobby.Server.Jobs
 
             Entity newGameEntity = CommandBuffer.Instantiate(index, Prefab);
             CommandBuffer.SetComponent(index, newGameEntity, gameInfoComponent);
-            CommandBuffer.AddComponent(index, newGameEntity, gameIdComponent);
+            CommandBuffer.SetComponent(index, newGameEntity, gameIdComponent);
         }
     }
 }
