@@ -9,7 +9,7 @@
     }
   ],
   "dependencies": {
-    "com.sibz.netcode": "0.0.26",
+    "com.sibz.netcode": "0.0.27",
     "com.sibz.netcode.client": "0.0.3",
     "com.sibz.netcode.server": "0.0.2",
     "com.unity.burst": "1.3.0-preview.10",
