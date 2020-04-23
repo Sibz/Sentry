@@ -6,35 +6,15 @@ namespace Sibz.Lobby.Server.Jobs
 {
     public struct DestroyGameJob
     {
-        /*
-        public struct Data
+        public EntityCommandBuffer.Concurrent CmdBuffer;
+        public NativeArray<Entity> GameEntities;
+        public NativeArray<GameIdComponent> GameIds;
+        public DynamicBuffer<LobbyAclBufferItem> AclBuffer;
+
+
+        public void Execute(Entity reqEntity, int index, ref DestroyGameRequest rpc, LobbyUser lobbyUser)
         {
-            public EntityCommandBuffer.Concurrent CmdBuffer;
-            public NativeArray<Entity> GameEntities;
-            public NativeArray<GameInfoComponent> GameInfos;
-        }
-
-        public static void Execute(Data data, Entity reqEntity, int index, ref DestroyGameRequest rpc)
-        {
-            if (TryGetEntityToDestroy(data.GameEntities, data.GameInfos, rpc.Id, out Entity destroyEntity))
-            {
-                data.CmdBuffer.DestroyEntity(index, destroyEntity);
-            }
-
-            data.CmdBuffer.DestroyEntity(index, reqEntity);
-        }
-        */
-
-
-            public EntityCommandBuffer.Concurrent CmdBuffer;
-            public NativeArray<Entity> GameEntities;
-            public NativeArray<GameIdComponent> GameIds;
-            public DynamicBuffer<LobbyAclBufferItem> AclBuffer;
-
-
-        public void  Execute(Entity reqEntity, int index, ref DestroyGameRequest rpc, LobbyUser lobbyUser)
-        {
-            LobbyAclBufferItem currentUserAcl = default;
+            LobbyAclBufferItem currentUserAcl = new LobbyAclBufferItem(lobbyUser.UserId);
             for (int i = 0; i < AclBuffer.Length; i++)
             {
                 if (AclBuffer[i].UserId == lobbyUser.UserId)
