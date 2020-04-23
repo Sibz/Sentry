@@ -9,7 +9,7 @@ using Unity.NetCode;
 namespace Sibz.Lobby.Server
 {
     [ServerSystem]
-    public class DestroyGameSystem : JobComponentSystem
+    public class DestroyGameSystem : SystemBase
     {
         private EndSimulationEntityCommandBufferSystem bufferSystem;
 
@@ -19,37 +19,45 @@ namespace Sibz.Lobby.Server
         protected override void OnCreate()
         {
             bufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
-            requiredToRunQuery = GetEntityQuery(typeof(DestroyGameRequest), typeof(ReceiveRpcCommandRequestComponent));
+            requiredToRunQuery = GetEntityQuery(
+                new EntityQueryDesc
+                {
+                    All = new []
+                    {
+                        ComponentType.ReadOnly<DestroyGameRequest>(),
+                        ComponentType.ReadOnly<ReceiveRpcCommandRequestComponent>(),
+                    }
+                });
             RequireForUpdate(requiredToRunQuery);
             gameInfosQuery = GetEntityQuery(typeof(GameIdComponent));
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
+            DynamicBuffer<LobbyAclBufferItem> aclBuffer = GetBufferFromEntity<LobbyAclBufferItem>(true)[GetSingletonEntity<LobbyAclBufferItem>()];
             DestroyGameJob jobData = new DestroyGameJob
             {
                 CmdBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent(),
                 GameEntities = gameInfosQuery.ToEntityArrayAsync(Allocator.TempJob, out JobHandle jh1),
                 GameIds = gameInfosQuery.ToComponentDataArrayAsync<GameIdComponent>(Allocator.TempJob,
-                    out JobHandle jh2)
+                    out JobHandle jh2),
+                AclBuffer = aclBuffer
             };
 
-            inputDeps = JobHandle.CombineDependencies(inputDeps, jh1, jh2);
+            Dependency = JobHandle.CombineDependencies(Dependency, jh1, jh2);
 
-            inputDeps = Entities
-                .WithAll<ReceiveRpcCommandRequestComponent>()
-                .ForEach((Entity entity, int entityInQueryIndex, ref DestroyGameRequest rpc) =>
+
+            Dependency = Entities
+                .ForEach((Entity entity, int entityInQueryIndex, ref DestroyGameRequest rpc, ref ReceiveRpcCommandRequestComponent requestComponent) =>
                 {
-                    jobData.Execute(entity, entityInQueryIndex, ref rpc);
-                }).Schedule(inputDeps);
+                    jobData.Execute(entity, entityInQueryIndex, ref rpc, GetComponent<LobbyUser>(requestComponent.SourceConnection));
+                }).Schedule(Dependency);
 
-            bufferSystem.AddJobHandleForProducer(inputDeps);
+            bufferSystem.AddJobHandleForProducer(Dependency);
 
-            inputDeps =
+            Dependency =
                 new Dealloc()
-                    { GameEntities = jobData.GameEntities, GameInfos = jobData.GameIds }.Schedule(inputDeps);
-
-            return inputDeps;
+                    { GameEntities = jobData.GameEntities, GameInfos = jobData.GameIds }.Schedule(Dependency);
         }
 
         public struct Dealloc : IJob

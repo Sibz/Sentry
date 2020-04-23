@@ -29,22 +29,40 @@ namespace Sibz.Lobby.Server.Jobs
             public EntityCommandBuffer.Concurrent CmdBuffer;
             public NativeArray<Entity> GameEntities;
             public NativeArray<GameIdComponent> GameIds;
+            public DynamicBuffer<LobbyAclBufferItem> AclBuffer;
 
 
-        public void  Execute(Entity reqEntity, int index, ref DestroyGameRequest rpc)
+        public void  Execute(Entity reqEntity, int index, ref DestroyGameRequest rpc, LobbyUser lobbyUser)
         {
-            if (TryGetEntityToDestroy(rpc.Id, out Entity destroyEntity))
+            LobbyAclBufferItem currentUserAcl = default;
+            for (int i = 0; i < AclBuffer.Length; i++)
             {
-                CmdBuffer.DestroyEntity(index, destroyEntity);
+                if (AclBuffer[i].UserId == lobbyUser.UserId)
+                {
+                    currentUserAcl = AclBuffer[i];
+                }
+            }
+
+            if (TryGetEntityToDestroy(rpc.Id, out int destroyIndex))
+            {
+                if (lobbyUser.UserId == GameIds[destroyIndex].UserId && currentUserAcl.DestroyOwnGame
+                    || currentUserAcl.DestroyAnyGame)
+                {
+                    CmdBuffer.DestroyEntity(index, GameEntities[destroyIndex]);
+                }
+                else
+                {
+                    // TODO Create unauthorised response
+                }
             }
 
             CmdBuffer.DestroyEntity(index, reqEntity);
         }
 
 
-        private bool TryGetEntityToDestroy(int id, out Entity entity)
+        private bool TryGetEntityToDestroy(int id, out int destroyIndex)
         {
-            entity = Entity.Null;
+            destroyIndex = -1;
             for (int i = 0; i < GameIds.Length; i++)
             {
                 if (GameIds[i].Id != id)
@@ -52,7 +70,7 @@ namespace Sibz.Lobby.Server.Jobs
                     continue;
                 }
 
-                entity = GameEntities[i];
+                destroyIndex = i;
                 return true;
             }
 

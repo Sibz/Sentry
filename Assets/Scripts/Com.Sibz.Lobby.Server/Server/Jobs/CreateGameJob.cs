@@ -13,6 +13,7 @@ namespace Sibz.Lobby.Server.Jobs
     {
         [ReadOnly][DeallocateOnJobCompletion] public NativeArray<TCreateGameRequest> CreateGameRpcRequests;
         [ReadOnly][DeallocateOnJobCompletion] public NativeArray<int> NewGameIds;
+        [ReadOnly][DeallocateOnJobCompletion] public NativeArray<int> UserIds;
         public EntityCommandBuffer.Concurrent CommandBuffer;
         public TCreateGameInfoJob CreateGameInfoJob;
         public Entity Prefab;
@@ -21,7 +22,7 @@ namespace Sibz.Lobby.Server.Jobs
         {
             int gameId = NewGameIds[index];
             TCreateGameRequest data = CreateGameRpcRequests[index];
-            GameIdComponent gameIdComponent = new GameIdComponent { Id = gameId };
+            GameIdComponent gameIdComponent = new GameIdComponent { Id = gameId, UserId = UserIds[index]};
 
             if (CreateGameInfoJob.ValidateRequest(data) != 0)
             {
