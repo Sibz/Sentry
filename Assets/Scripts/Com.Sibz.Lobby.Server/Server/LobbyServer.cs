@@ -35,18 +35,6 @@ namespace Sibz.Lobby.Server
                 World.EntityManager.CreateEntity(
                     World.EntityManager.CreateArchetype(ComponentType.ReadOnly<LobbyAclBufferItem>()));
             };
-
-            ClientConnected += entity =>
-            {
-                World.EntityManager.AddComponent<LobbyUser>(entity);
-                /*var ghostCollection = World.EntityManager.CreateEntityQuery(typeof(GhostPrefabCollectionComponent)).GetSingleton<GhostPrefabCollectionComponent>();
-                var ghostId = SentryGhostSerializerCollection.FindGhostType<LobbyConnectionGhostSnapshotData>();
-                var prefab = World.EntityManager.GetBuffer<GhostPrefabBuffer>(ghostCollection.serverPrefabs)[ghostId].Value;
-                var player = World.EntityManager.Instantiate(prefab);
-                World.EntityManager.SetComponentData(player, new LobbyClientConnection() { ConnectionId = World.EntityManager.GetComponentData<NetworkIdComponent>(entity).Value});
-
-                World.EntityManager.SetComponentData(entity, new CommandTargetComponent {targetEntity = player});*/
-            };
             CreateWorld();
             Listen();
         }
